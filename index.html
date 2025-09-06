@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AK Restro - Restaurant Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f6f1;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(to right, #8b0000, #cc0000);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: white;
+            border: 2px solid #8b0000;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background-color: #8b0000;
+            color: white;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .menu-item {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .item-image {
+            height: 200px;
+            background-color: #f3e5d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b0000;
+            font-size: 3rem;
+        }
+        
+        .item-content {
+            padding: 1.5rem;
+        }
+        
+        .item-title {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .item-price {
+            color: #8b0000;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .item-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .add-to-cart {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #8b0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        
+        .add-to-cart:hover {
+            background-color: #a52a2a;
+        }
+        
+        .cart-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        .cart-icon {
+            font-size: 1.5rem;
+            color: #8b0000;
+            position: relative;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ff4500;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .cart-modal {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .cart-modal.open {
+            right: 0;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .cart-items {
+            margin-bottom: 2rem;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .cart-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid #eee;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: #8b0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .checkout-btn:hover {
+            background-color: #a52a2a;
+        }
+        
+        .empty-cart-message {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cart-modal {
+                width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><i class="fas fa-utensils"></i> AK Restro </div>
+        <p class="tagline">Exquisite cuisine for every palate</p>
+    </header>
+    
+    <div class="container">
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All Items</button>
+            <button class="filter-btn" data-filter="appetizer">Appetizers</button>
+            <button class="filter-btn" data-filter="main">Main Courses</button>
+            <button class="filter-btn" data-filter="dessert">Desserts</button>
+            <button class="filter-btn" data-filter="beverage">Beverages</button>
+        </div>
+        
+        <div class="menu-grid">
+            <!-- Appetizers -->
+            <div class="menu-item" data-category="appetizer">
+                <div class="item-image">
+                    <i class="fas fa-bread-slice"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Garlic Breadsticks</h3>
+                    <p class="item-price">Rs.250</p>
+                    <p class="item-description">Freshly baked breadsticks brushed with garlic butter and sprinkled with parsley.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <div class="menu-item" data-category="appetizer">
+                <div class="item-image">
+                    <i class="fas fa-cheese"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Mozzarella Sticks</h3>
+                    <p class="item-price">Rs.280</p>
+                    <p class="item-description">Crispy fried mozzarella served with marinara sauce.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Main Courses -->
+            <div class="menu-item" data-category="main">
+                <div class="item-image">
+                    <i class="fas fa-pizza-slice"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Margherita Pizza</h3>
+                    <p class="item-price">Rs.300</p>
+                    <p class="item-description">Classic pizza with tomato sauce, fresh mozzarella, and basil.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <div class="menu-item" data-category="main">
+                <div class="item-image">
+                    <i class="fas fa-hamburger"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Gourmet Burger</h3>
+                    <p class="item-price">Rs.310</p>
+                    <p class="item-description">Beef patty with cheddar, bacon, lettuce, tomato, and special sauce.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <div class="menu-item" data-category="main">
+                <div class="item-image">
+                    <i class="fas fa-fish"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Grilled Salmon</h3>
+                    <p class="item-price">Rs.250</p>
+                    <p class="item-description">Atlantic salmon with lemon butter sauce and seasonal vegetables.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Desserts -->
+            <div class="menu-item" data-category="dessert">
+                <div class="item-image">
+                    <i class="fas fa-ice-cream"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Chocolate Lava Cake</h3>
+                    <p class="item-price">Rs.150</p>
+                    <p class="item-description">Warm chocolate cake with a molten center, served with vanilla ice cream.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <div class="menu-item" data-category="dessert">
+                <div class="item-image">
+                    <i class="fas fa-cookie"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Tiramisu</h3>
+                    <p class="item-price">Rs.200</p>
+                    <p class="item-description">Classic Italian dessert with layers of coffee-soaked ladyfingers and mascarpone cream.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <!-- Beverages -->
+            <div class="menu-item" data-category="beverage">
+                <div class="item-image">
+                    <i class="fas fa-coffee"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Italian Coffee</h3>
+                    <p class="item-price">Rs.170</p>
+                    <p class="item-description">Rich, aromatic coffee brewed to perfection.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+            
+            <div class="menu-item" data-category="beverage">
+                <div class="item-image">
+                    <i class="fas fa-cocktail"></i>
+                </div>
+                <div class="item-content">
+                    <h3 class="item-title">Fresh Lemonade</h3>
+                    <p class="item-price">Rs.70</p>
+                    <p class="item-description">Freshly squeezed lemons with a hint of mint and sweetness.</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cart-container">
+        <div class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count">0</span>
+        </div>
+    </div>
+    
+    <div class="cart-modal">
+        <div class="cart-header">
+            <h2>Your Order</h2>
+            <button class="close-cart"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items">
+            <p class="empty-cart-message">Your cart is empty. Add some delicious items!</p>
+        </div>
+        <div class="cart-total">
+            Total: Rs.<span id="total-amount">0.00</span>
+        </div>
+        <button class="checkout-btn">Checkout</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    button.classList.add('active');
+                    
+                    const filter = button.getAttribute('data-filter');
+                    
+                    menuItems.forEach(item => {
+                        if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Cart functionality
+            const cartButtons = document.querySelectorAll('.add-to-cart');
+            const cartCount = document.querySelector('.cart-count');
+            const cartModal = document.querySelector('.cart-modal');
+            const closeCart = document.querySelector('.close-cart');
+            const cartContainer = document.querySelector('.cart-container');
+            const cartItems = document.querySelector('.cart-items');
+            const totalAmount = document.getElementById('total-amount');
+            
+            let cart = [];
+            let count = 0;
+            
+            cartButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const item = button.closest('.menu-item');
+                    const title = item.querySelector('.item-title').textContent;
+                    const price = parseFloat(item.querySelector('.item-price').textContent.replace('Rs.', ''));
+                    
+                    // Check if item already exists in cart
+                    const existingItem = cart.find(cartItem => cartItem.title === title);
+                    
+                    if (existingItem) {
+                        existingItem.quantity++;
+                    } else {
+                        cart.push({
+                            title,
+                            price,
+                            quantity: 1
+                        });
+                    }
+                    
+                    count++;
+                    cartCount.textContent = count;
+                    
+                    updateCart();
+                });
+            });
+            
+            // Open cart modal
+            cartContainer.addEventListener('click', () => {
+                cartModal.classList.add('open');
+            });
+            
+            // Close cart modal
+            closeCart.addEventListener('click', () => {
+                cartModal.classList.remove('open');
+            });
+            
+            // Update cart display
+            function updateCart() {
+                cartItems.innerHTML = '';
+                
+                if (cart.length === 0) {
+                    cartItems.innerHTML = '<p class="empty-cart-message">Your cart is empty. Add some delicious items!</p>';
+                    totalAmount.textContent = '0.00';
+                    return;
+                }
+                
+                let total = 0;
+                
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    
+                    const cartItemElement = document.createElement('div');
+                    cartItemElement.classList.add('cart-item');
+                    cartItemElement.innerHTML = `
+                        <div>
+                            <h4>Rs.{item.title}</h4>
+                            <p>Rs.${item.price.toFixed(2)} x Rs.{item.quantity}</p>
+                        </div>
+                        <div>
+                            <p>Rs.${itemTotal.toFixed(2)}</p>
+                        </div>
+                    `;
+                    
+                    cartItems.appendChild(cartItemElement);
+                });
+                
+                totalAmount.textContent = total.toFixed(2);
+            }
+            
+            // Checkout button
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            checkoutBtn.addEventListener('click', () => {
+                if (cart.length > 0) {
+                    alert('Thank you for your order! Your food will be ready soon.');
+                    cart = [];
+                    count = 0;
+                    cartCount.textContent = '0';
+                    updateCart();
+                    cartModal.classList.remove('open');
+                } else {
+                    alert('Your cart is empty. Please add some items first.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
